@@ -1,0 +1,179 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    background: #121212;
+    color: white;
+    gap: 10px;
+}
+
+.toolbar .toggle {
+    width: 110px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.toggle .toggle-icon {
+    width: 35px;
+    height: 35px;
+}
+
+.toolbar .logo {
+    font-size: 18px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.logo .logo-img{
+    width: 85px;
+    height: auto;
+    object-fit: cover;
+}
+
+.actions{
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 1;
+    align-items: center;
+}
+
+.actions button {
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.right{
+    display: flex;
+    gap: 15px;
+    margin-right: 30px;
+}
+.actions .icon{
+    width: 24px;
+    height: 24px;
+}
+
+.undo .icon, .redo .icon{
+    width: 30px;
+    height: 30px;
+}
+
+.main-container {
+    display: flex;
+    flex: 1;
+    background: #f0f0f0;
+}
+
+.left{
+    display: flex;
+    position: relative;
+}
+
+.sidebar {
+    background: #121212;
+    color: white;
+    width: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.sidebar-item {
+    border: none;
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    background-color: transparent;
+}
+
+.sidebar-item .icon{
+    width: 30px;
+    height: 30px;
+}
+.sidebar-item .text{
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.options-grid{
+    overflow-y: auto;
+    background-color: #303030;
+    width: 235px;
+}
+.toolbar-editor{
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: calc(100vw - 345px);
+    height: 50px;
+    background-color: white;
+}
+
+.canvas-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f1f5;
+    position: relative;
+}
+
+#image-upload {
+    display: none;
+}
+
+#konva-container {
+    width: 80%;
+    height: 80%;
+    position: relative;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: #ecf0f1;
+}
+
+.tags {
+    flex-grow: 1;
+    padding: 5px;
+}
+
+.zoom-slider {
+    margin-left: 10px;
+}
+
+.ai-button {
+    background: #9b59b6;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+}

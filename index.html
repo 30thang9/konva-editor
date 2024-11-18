@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>PhotoBook Editor</title>
+	<link rel="stylesheet" href="assets/css/konva.css">
+	<link rel="stylesheet" href="assets/font/font-awesome.min.css">
+	<script src="assets/vendor/js/jquery.min.js"></script>
+	<script src="assets/vendor/js/konva.min.js"></script>
+</head>
+<body>
+<div class="toolbar">
+	<div class="toggle">
+		<img class="toggle-icon" src="assets/images/toggle-icon.png" alt="">
+	</div>
+	<div class="logo">
+		<img class="logo-img" src="assets/images/logo.png" alt="">
+	</div>
+	<div class="actions">
+		<div class="left">
+			<button class="undo" id="undo">
+				<img class="icon" src="assets/images/undo-icon.png" alt="">
+			</button>
+			<button class="redo" id="redo">
+				<img class="icon" src="assets/images/redo-icon.png" alt="">
+			</button>
+			<input type="text" class="design-name" placeholder="Tên thiết kế">
+		</div>
+		<div class="right">
+			<button class="save">
+				<img class="icon" src="assets/images/save-icon.png" alt="">
+				Lưu
+			</button>
+			<button class="print">
+				<img class="icon" src="assets/images/print-icon.png" alt="">
+				In cùng PhotoBook
+			</button>
+			<button class="exit">Thoát</button>
+		</div>
+	</div>
+</div>
+<div class="main-container">
+	<div class="left">
+		<div class="sidebar">
+			<button class="sidebar-item">
+				<img class="icon" src="assets/images/frame-icon.png" alt="">
+				<span class="text">Viền ảnh</span>
+			</button>
+			<button class="sidebar-item crop-image">
+				<img class="icon" src="assets/images/crop-icon.png" alt="">
+				<span class="text">Cắt</span>
+			</button>
+			<button class="sidebar-item" id="button-image-upload">
+				<img class="icon" src="assets/images/upload-icon.png" alt="">
+				<span class="text">Tải ảnh</span>
+			</button>
+			<input type="file" id="image-upload" style="display: none;">
+			<button class="sidebar-item" id="add-text">
+				<img class="icon" src="assets/images/text-icon.png" alt="">
+				<span class="text">Văn bản</span>
+			</button>
+			<button class="sidebar-item">
+				<img class="icon" src="assets/images/sticker-icon.png" alt="">
+				<span class="text">Sticker</span>
+			</button>
+			<button class="sidebar-item">
+				<img class="icon" src="assets/images/draw-icon.png" alt="">
+				<span class="text">Vẽ</span>
+			</button>
+		</div>
+		<div class="options-grid" id="options-grid"></div>
+		<div class="toolbar-editor" id="toolbar-editor"></div>
+	</div>
+	<div class="canvas-container">
+		<div id="konva-container"></div>
+	</div>
+</div>
+<div class="footer">
+	<input type="text" class="tags" placeholder="Thêm mô tả">
+	<div class="zoom-slider">
+		<label for="zoom">Zoom:</label>
+		<input id="zoom" type="range" min="10" max="200" value="100">
+	</div>
+	<button class="ai-button">AI</button>
+</div>
+<script src="src/KonvaImage.js"></script>
+<script src="src/KonvaText.js"></script>
+<script src="src/ScaleTransformer.js"></script>
+<script src="src/BaseScene.js"></script>
+<script src="src/CropScene.js"></script>
+<script src="src/TextScene.js"></script>
+<script src="src/CustomScene.js"></script>
+<script src="src/SceneManager.js"></script>
+<script src="index.js"></script>
+</body>
+</html>
