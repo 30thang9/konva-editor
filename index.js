@@ -57,10 +57,10 @@ function bootstrap() {
 			fontSize: 26,
 			fontFamily: 'Arial',
 			fill: 'blue',
-			name: "Text",
 		});
 		imageView.add(konvaText);
 		sceneManager.getScene(BaseScene).setSelection([konvaText]);
+
 	});
 }
 

@@ -1,47 +1,79 @@
 class BaseScene extends Konva.Group {
 	static sceneId = "BaseScene";
+
 	/**
 	 * @private
 	 * @type {Konva.Stage}
 	 */
 	_stage;
+
 	/**
 	 * @private
 	 * @type {SceneManager}
 	 */
 	_sceneManager;
+
 	/**
 	 * @private
-	 * @type {Konva.Transformer}
+	 * @type {Map<string, Konva.Transformer>}
 	 */
-	_scaleTransformer;
+	_transformers;
 
 	constructor(stage, sceneManager) {
 		super();
 		this._stage = stage;
 		this._sceneManager = sceneManager;
-		this._scaleTransformer = new ScaleTransformer();
-		this.add(this._scaleTransformer);
+
+		// Initialize transformers mapping
+		this._transformers = new Map();
+
+		// Register supported transformers
+		this._registerTransformer(ConstantType.IMAGE, new ScaleTransformer());
+		this._registerTransformer(
+			ConstantType.TEXT,
+			new ScaleTransformer({
+				enabledAnchors: ["top-left", "top-right", "bottom-left", "bottom-right", "middle-left", "middle-right"],
+			})
+		);
+
 		this._handlePointerDown = this._handlePointerDown.bind(this);
 		this._handleDoubleClick = this._handleDoubleClick.bind(this);
 		this._handleTransformStart = this._handleTransformStart.bind(this);
 	}
+
+	/**
+	 * Register a transformer for a specific node type.
+	 * @private
+	 * @param {string} nodeType - Node type (e.g., "Image", "Text").
+	 * @param {Konva.Transformer} transformer - Transformer instance.
+	 */
+	_registerTransformer(nodeType, transformer) {
+		this._transformers.set(nodeType, transformer);
+		this.add(transformer);
+	}
+
 	/**
 	 * @private
 	 */
 	_registerEvents() {
 		this._stage.on("pointerdown", this._handlePointerDown);
 		this._stage.on("pointerdblclick", this._handleDoubleClick);
-		this._scaleTransformer.on("transformstart", this._handleTransformStart);
+		for (const transformer of this._transformers.values()) {
+			transformer.on("transformstart", this._handleTransformStart);
+		}
 	}
+
 	/**
 	 * @private
 	 */
 	_unbindEvents() {
 		this._stage.off("pointerdown", this._handlePointerDown);
 		this._stage.off("pointerdblclick", this._handleDoubleClick);
-		this._scaleTransformer.off("transformstart", this._handleTransformStart);
+		for (const transformer of this._transformers.values()) {
+			transformer.off("transformstart", this._handleTransformStart);
+		}
 	}
+
 	/**
 	 * @private
 	 */
@@ -49,51 +81,75 @@ class BaseScene extends Konva.Group {
 		if (target.hasName("_anchor")) {
 			return;
 		}
-		if (target.className === "Image" || target.className === "Text") {
+
+		const nodeType = target.className;
+		if (this._transformers.has(nodeType)) {
 			const isSelected = this.getSelection() === target;
-			if (isSelected) {
-				return;
+			if (!isSelected) {
+				this.setSelection(target);
 			}
-			this.setSelection([target]);
-		}
-		else {
-			this.setSelection([]);
+		} else {
+			this.setSelection(null);
 		}
 	}
+
 	/**
 	 * @private
 	 */
 	_handleDoubleClick(e) {
 		const selection = this.getSelection();
 		if (e.target === selection) {
-			if (selection.className === "Image") {
+			if (selection.className === ConstantType.IMAGE) {
 				this._sceneManager.goto(CropScene);
-			}else if(selection.className === "Text") {
+			} else if (selection.className === ConstantType.TEXT) {
 				this._sceneManager.goto(TextScene);
 			}
 		}
 	}
+
 	/**
 	 * @private
 	 */
-	_handleTransformStart() {
+	_handleTransformStart = () => {
 		const selection = this.getSelection();
-		const activeAnchor = this._scaleTransformer.getActiveAnchor();
-		selection.handleTransformStart(activeAnchor);
-
+	
+		if (!selection) {
+			return;
+		}
+	
+		const nodeType = selection.className;
+		const transformer = this._transformers.get(nodeType);
+	
+		if (!transformer) {
+			return; // No transformer registered for this node type
+		}
+	
+		const activeAnchor = transformer.getActiveAnchor();
+		if (selection.handleTransformStart) {
+			selection.handleTransformStart(activeAnchor);
+		}
+	
+		// Transform handler
 		const transformHandler = () => {
-			selection.handleTransform(activeAnchor);
+			if (selection.handleTransform) {
+				selection.handleTransform(activeAnchor);
+			}
 		};
-
+	
+		// Transform end handler
 		const transformEndHandler = () => {
-			this._scaleTransformer.off("transform", transformHandler);
-			this._scaleTransformer.off("transformend", transformEndHandler);
-			selection.handleTransformEnd(activeAnchor);
+			transformer.off("transform", transformHandler);
+			transformer.off("transformend", transformEndHandler);
+	
+			if (selection.handleTransformEnd) {
+				selection.handleTransformEnd(activeAnchor);
+			}
 		};
-
-		this._scaleTransformer.on("transform", transformHandler);
-		this._scaleTransformer.on("transformend", transformEndHandler);
-	}
+	
+		transformer.on("transform", transformHandler);
+		transformer.on("transformend", transformEndHandler);
+	};
+	
 
 	hide() {
 		super.hide();
@@ -105,11 +161,43 @@ class BaseScene extends Konva.Group {
 		this._registerEvents();
 	}
 
+	/**
+	 * Get the currently selected node.
+	 * @returns {Konva.Node|null}
+	 */
 	getSelection() {
-		return this._scaleTransformer.nodes()[0] ?? null;
+		for (const transformer of this._transformers.values()) {
+			const nodes = transformer.nodes();
+			if (nodes.length > 0) {
+				return nodes[0];
+			}
+		}
+		return null;
 	}
 
+	/**
+	 * Set the current selection.
+	 * @param {Konva.Node|null} target
+	 */
 	setSelection(target) {
-		this._scaleTransformer.nodes(target);
+		// Clear all transformers
+		for (const transformer of this._transformers.values()) {
+			transformer.nodes([]);
+		}
+
+		if (!target) {
+			return;
+		}
+
+		// Set the target node in its corresponding transformer
+		const nodeType = target.className;
+		const transformer = this._transformers.get(nodeType);
+
+		if (transformer) {
+			transformer.nodes([target]);
+		}else{
+			console.log('No transformer found for node type:', nodeType);
+		}
 	}
+
 }

@@ -15,15 +15,15 @@ class KonvaText extends Konva.Text {
 
     constructor(config) {
         super(config);
-        this.draggable(true); // Cho phép kéo thả
-        this._lastSize = this.size(); // Lưu kích thước ban đầu
+        this.draggable(true);
+        this._lastSize = this.size();
     }
 
     /**
      * before transform
      */
     handleTransformStart() {
-        this._lastSize = this.size(); // Lưu lại kích thước hiện tại khi bắt đầu thay đổi
+        this._lastSize = this.size();
     }
 
     /**
@@ -39,14 +39,14 @@ class KonvaText extends Konva.Text {
      * after transform
      */
     handleTransformEnd() {
-        this._lastSize = null; // Reset kích thước cuối cùng sau khi transform
+        this._lastSize = null;
     }
 
-    /**
-     * Keep ratio when scaling
-     * @param {typeof this._lastSize} curSize - Kích thước hiện tại
-     * @param {typeof this._lastSize} lastSize - Kích thước trước đó
-     * @param {string} anchor - Điểm đang kéo
+   /**
+     * Handle resizing while maintaining constraints and ratios
+     * @param {typeof this._lastSize} curSize - Current size
+     * @param {typeof this._lastSize} lastSize - Last size
+     * @param {string} anchor - The anchor being dragged
      */
     handleResize(curSize, lastSize, anchor) {
         let newWidth = curSize.width;
