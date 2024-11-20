@@ -14,6 +14,9 @@ function bootstrap() {
 	const sceneManager = new SceneManager(stage);
 	layer.add(imageView, sceneManager);
 
+	const stateManager = new StateManager();
+	stateManager.saveState(stage); // Save the initial state
+
 	sceneManager.goto(BaseScene);
 
 	document.getElementById("button-image-upload").addEventListener("click", function(e) {
@@ -31,6 +34,7 @@ function bootstrap() {
 		img.src = objectUrl;
 		img.onload = () => {
 			URL.revokeObjectURL(objectUrl);
+
 			// adapt to canvas
 			const padding = 12;
 			const scaleX = (container.offsetWidth - padding * 2) / img.width;
@@ -43,14 +47,16 @@ function bootstrap() {
 			const height = img.height * scale;
 			const x = container.offsetWidth / 2 - width / 2;
 			const y = container.offsetHeight / 2 - height / 2;
-			const konvaImage = new KonvaImage({ x, y, width, height, image: img });
+			const konvaImage = new Konva.Image({ x, y, width, height, image: img });
 			imageView.add(konvaImage);
 			sceneManager.getScene(BaseScene).setSelection([konvaImage]);
+
+			stateManager.saveState(stage); // Save the state after adding an image
 		};
 	});
 
 	document.getElementById("add-text").addEventListener("click", function(e) {
-		const konvaText = new KonvaText({
+		const konvaText = new Konva.Text({
 			text: 'Text Sample',
 			x: 100,
 			y: 100,
@@ -61,6 +67,17 @@ function bootstrap() {
 		imageView.add(konvaText);
 		sceneManager.getScene(BaseScene).setSelection([konvaText]);
 
+		stateManager.saveState(stage); // Save the state after adding text
+	});
+
+	document.getElementById("undo").addEventListener("click", function() {
+		stateManager.undo(stage); // Undo the last state
+		layer.batchDraw();
+	});
+
+	document.getElementById("redo").addEventListener("click", function() {
+		stateManager.redo(stage); // Redo the last undone state
+		layer.batchDraw();
 	});
 }
 
