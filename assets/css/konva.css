@@ -89,12 +89,12 @@ body {
 .sidebar {
     background: #121212;
     color: white;
-    width: 110px;
+    width: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    padding: 10px 0;
+    padding: 10px 5px;
 }
 
 .sidebar-item {
@@ -107,6 +107,12 @@ body {
     gap: 10px;
     align-items: center;
     background-color: transparent;
+    width: 100%;
+}
+
+.sidebar-item.active {
+    background-color: #303030;
+    border-radius: 5px;
 }
 
 .sidebar-item .icon{

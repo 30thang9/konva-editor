@@ -13,7 +13,7 @@ function bootstrap() {
 	const imageView = new Konva.Group();
 	const sceneManager = new SceneManager(stage);
 	layer.add(imageView, sceneManager);
-
+	
 	sceneManager.goto(BaseScene);
 
 	document.getElementById("button-image-upload").addEventListener("click", function(e) {
@@ -62,6 +62,14 @@ function bootstrap() {
 		sceneManager.getScene(BaseScene).setSelection([konvaText]);
 
 	});
+
+	document.getElementById("undo").addEventListener("click", () => {
+	});
+
+	document.getElementById("redo").addEventListener("click", () => {
+	});
+
+
 }
 
 bootstrap();

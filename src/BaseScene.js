@@ -28,13 +28,7 @@ class BaseScene extends Konva.Group {
 		this._transformers = new Map();
 
 		// Register supported transformers
-		this._registerTransformer(ConstantType.IMAGE, new ScaleTransformer());
-		this._registerTransformer(
-			ConstantType.TEXT,
-			new ScaleTransformer({
-				enabledAnchors: ["top-left", "top-right", "bottom-left", "bottom-right", "middle-left", "middle-right"],
-			})
-		);
+		this._registerTransformers();
 
 		this._handlePointerDown = this._handlePointerDown.bind(this);
 		this._handleDoubleClick = this._handleDoubleClick.bind(this);
@@ -42,14 +36,17 @@ class BaseScene extends Konva.Group {
 	}
 
 	/**
-	 * Register a transformer for a specific node type.
 	 * @private
-	 * @param {string} nodeType - Node type (e.g., "Image", "Text").
-	 * @param {Konva.Transformer} transformer - Transformer instance.
 	 */
-	_registerTransformer(nodeType, transformer) {
-		this._transformers.set(nodeType, transformer);
-		this.add(transformer);
+	_registerTransformers() {
+		const nodeTypes = [ConstantType.IMAGE, ConstantType.TEXT];
+		nodeTypes.forEach((nodeType) => {
+			const transformer = TransformerFactory.createTransformer(nodeType);
+			if (transformer) {
+				this._transformers.set(nodeType, transformer);
+				this.add(transformer);
+			}
+		});
 	}
 
 	/**
@@ -99,11 +96,7 @@ class BaseScene extends Konva.Group {
 	_handleDoubleClick(e) {
 		const selection = this.getSelection();
 		if (e.target === selection) {
-			if (selection.className === ConstantType.IMAGE) {
-				this._sceneManager.goto(CropScene);
-			} else if (selection.className === ConstantType.TEXT) {
-				this._sceneManager.goto(TextScene);
-			}
+			SceneActionHandler.handleDoubleClick(selection, this._sceneManager);
 		}
 	}
 
@@ -112,44 +105,44 @@ class BaseScene extends Konva.Group {
 	 */
 	_handleTransformStart = () => {
 		const selection = this.getSelection();
-	
+
 		if (!selection) {
 			return;
 		}
-	
+
 		const nodeType = selection.className;
 		const transformer = this._transformers.get(nodeType);
-	
+
 		if (!transformer) {
 			return; // No transformer registered for this node type
 		}
-	
+
 		const activeAnchor = transformer.getActiveAnchor();
 		if (selection.handleTransformStart) {
 			selection.handleTransformStart(activeAnchor);
 		}
-	
+
 		// Transform handler
 		const transformHandler = () => {
 			if (selection.handleTransform) {
 				selection.handleTransform(activeAnchor);
 			}
 		};
-	
+
 		// Transform end handler
 		const transformEndHandler = () => {
 			transformer.off("transform", transformHandler);
 			transformer.off("transformend", transformEndHandler);
-	
+
 			if (selection.handleTransformEnd) {
 				selection.handleTransformEnd(activeAnchor);
 			}
 		};
-	
+
 		transformer.on("transform", transformHandler);
 		transformer.on("transformend", transformEndHandler);
 	};
-	
+
 
 	hide() {
 		super.hide();
